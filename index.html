@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domain Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0d1117;
+      color: #c9d1d9;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin-top: 20px;
+      background-color: #161b22;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+      border-radius: 5px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 12px;  /* Adjusted font size for the paragraph */
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .loading {
+      color: yellow;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p>Check if a domain is available under <code>is-a.dev</code></p>
+    <input type="text" id="domain" placeholder="Enter domain name (e.g. test)" oninput="checkDomain()">
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const resultElement = document.getElementById('result');
+
+    // Check domain availability as user types
+    async function checkDomain() {
+      const domainInput = document.getElementById('domain').value.trim().toLowerCase();
+      
+      if (domainInput === '') {
+        resultElement.textContent = '';
+        return;
+      }
+
+      const formattedDomain = domainInput.replace(/\s+/g, '-'); // Replace spaces with hyphens
+      const url = `https://raw.githubusercontent.com/is-a-dev/register/main/domains/${formattedDomain}.json`;
+
+      resultElement.textContent = 'Checking availability...';
+      resultElement.classList.add('loading');
+      
+      try {
+        const response = await fetch(url);
+
+        if (response.status === 404) {
+          resultElement.textContent = `Congratulations, ${formattedDomain}.is-a.dev is available!`;
+          resultElement.style.color = 'green';
+        } else {
+          resultElement.textContent = `Sorry, ${formattedDomain}.is-a.dev is taken.`;
+          resultElement.style.color = 'red';
+        }
+      } catch (error) {
+        console.error('Error checking domain:', error);
+        resultElement.textContent = 'Error checking domain availability.';
+        resultElement.style.color = 'yellow';
+      }
+
+      resultElement.classList.remove('loading');
+    }
+  </script>
+</body>
+</html>
